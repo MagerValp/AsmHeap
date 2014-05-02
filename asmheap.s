@@ -10,10 +10,13 @@
 	.bss
 
 	.align 128
-_asmheap_tree:
-tree:	.res 128		; Reserve 128 bytes for the tree, which allows
-				; us to use the N flag for checks.
-_asmheap_size:	.res 1
+
+tree:	.res 128	; Reserve 128 bytes for the tree, which allows
+size:	.res 1		; us to use the N flag to check if it's full.
+
+; Exported names.
+_asmheap_tree = tree
+_asmheap_size = size
 
 
 	.code
@@ -21,7 +24,7 @@ _asmheap_size:	.res 1
 ; Initialize an empty heap.
 _asmheap_init:
 	lda #0
-	sta _asmheap_size
+	sta size
 	rts
 
 
@@ -38,13 +41,14 @@ _asmheap_init:
 
 ; Push a value into the tree.
 _asmheap_push:
-	ldx _asmheap_size
-	; Do nothing if the heap is full.
-	bmi @done
-	
-	; Push A to the bottom of the heap.
+	ldx size
+	; If the heap is full, overwrite the last node.
+	bpl :+
+	dex
+	stx size
+:	; Push A to the bottom of the heap.
 	sta tree,x
-	inc _asmheap_size
+	inc size
 
 	; Set Y to the parent node = (X - 1) / 2.
 	txa
@@ -81,9 +85,9 @@ _asmheap_pop:
 	lda tree
 	sta @return_value
 	; Remove the item at the bottom of the tree.
-	dec _asmheap_size
+	dec size
 	beq @done
-	ldy _asmheap_size
+	ldy size
 	lda tree,y
 	; Move it to the top of the tree.
 	sta tree
@@ -98,7 +102,7 @@ _asmheap_pop:
 	adc #1
 	tay
 	; Check if we're at the bottom of the tree.
-	cpy _asmheap_size
+	cpy size
 	bcs @done
 	; Check if left child is smaller.
 	lda tree,y
@@ -112,7 +116,7 @@ _asmheap_pop:
 	; Right child is at x * 2 + 2, or left + 1.
 	iny
 	; Check if we're at the bottom of the tree.
-	cpy _asmheap_size
+	cpy size
 	bcs @check_swap
 	; Check if right child is smaller.
 	lda tree,y
