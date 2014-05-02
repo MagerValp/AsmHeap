@@ -144,6 +144,3 @@ _asmheap_pop:
 @return_value = * + 1
 	lda #$5e		; Self mod.
 	rts
-
-	.bss
-
