@@ -12,13 +12,13 @@
 void test_benchmark_asmheap(void) {
     static uint8_t i, j;
     
-    cputs("  Asm heap 10 * 128 push/pop:    ");
+    cputs("  Asm heap 100 * 128 push/pop:   ");
     asmheap_init();
     
     benchmark_init();
     benchmark_start();
     
-    for (j = 0; j < 10; ++j) {
+    for (j = 0; j < 100; ++j) {
         for (i = 0; i < 128; ++i) {
             asmheap_push(test_data_random[i]);
         }
@@ -37,13 +37,13 @@ void test_benchmark_asmheap(void) {
 void test_benchmark_cheap(void) {
     static uint8_t i, j;
     
-    cputs("  C heap 10 * 128 push/pop:      ");
+    cputs("  C heap 100 * 128 push/pop:     ");
     cheap_init();
     
     benchmark_init();
     benchmark_start();
     
-    for (j = 0; j < 10; ++j) {
+    for (j = 0; j < 100; ++j) {
         for (i = 0; i < 128; ++i) {
             cheap_push(test_data_random[i]);
         }
